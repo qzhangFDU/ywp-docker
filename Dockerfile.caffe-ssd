@@ -155,6 +155,20 @@ RUN cd /usr/lib/x86_64-linux-gnu && \
 	sudo ln -s libhdf5_serial_hl.so.8.0.2 libhdf5_hl.so && \
 	cd ~
 
+
+# Install OpenCV
+RUN git clone --depth 1 https://github.com/opencv/opencv.git /root/opencv && \
+	cd /root/opencv && \
+	mkdir build && \
+	cd build && \
+	cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON -DWITH_XINE=ON -DBUILD_EXAMPLES=OFF -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs .. && \
+	make -j"$(nproc)"  && \
+	make install && \
+	ldconfig && \
+	echo 'ln /dev/null /dev/raw1394' >> ~/.bashrc
+
+
+
 COPY caffe-ssd ~/caffe-ssd
 
 # Caffe-SSD
@@ -162,7 +176,7 @@ COPY caffe-ssd ~/caffe-ssd
 WORKDIR ~/caffe-ssd
 
 RUN	git checkout ssd && \
-	make -j8
+		make -j8
 RUN	make py && \
 	make test -j8 && \
 	make runtest -j8
