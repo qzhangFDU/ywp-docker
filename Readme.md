@@ -37,8 +37,9 @@ nvidia-docker run -rm -it \
     deepaul zsh
 
 # if GUI is needed
-        nvidia-docker run --rm -it \
+nvidia-docker run --rm -it \
     --user=$(id -u) \
+    --env="PYTHONPATH=/root/caffe-ssd/python" \
     --env="DISPLAY" \
     --workdir=/app \
     --volume="$PWD":/app \
@@ -47,7 +48,5 @@ nvidia-docker run -rm -it \
     --volume="/etc/shadow:/etc/shadow:ro" \
     --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-    deepaul python test.python
-
-
+    deepaul python test.py
 ```bash
