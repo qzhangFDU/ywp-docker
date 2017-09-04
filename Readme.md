@@ -1,3 +1,4 @@
+
 Inspired by [floydhub/dl-docker](https://github.com/floydhub/dl-docker), this docker includes my personal setting for Deep Learning development.
 
 This dockerfile includes:
@@ -19,13 +20,37 @@ This dockerfile includes:
 
 * Welcome to grab this, but note that I am new to Docker and this dockerfile is also for practice. 
 
+# Install docker
+https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+
+```bash
+sudo groupadd docker
+sudo usermod -aG docker $USER
+(log out and in)
+docker run hello-world
+```
+
+# Install nvidia-docker
+https://github.com/NVIDIA/nvidia-docker
+
+# Move docker directory (in case of the lack of the root space)
+https://linuxconfig.org/how-to-move-docker-s-default-var-lib-docker-to-another-directory-on-ubuntu-debian-linux
+```bash
+systemctl stop docker                       # (or) docker service stop
+ps aux | grep -i docker | grep -v grep      # make sure nothing 
+mkdir /new/path/docker
+sudo rsync -axP --info=progress2 /var/lib/docker/ /new/path/docker
+sudo subl lib/systemd/system/docker.service
+    # (change) ExecStart=/usr/bin/dockerd -g /new/path/docker -H fd://
+systemctl daemon-reload
+systemctl start docker
+```
 
 # Some useful commands
 
 ```bash
-
-# run a certain python through docker
-docker build -t deepaul -f Dockerfile.gpu .   # build
+# build
+docker build -t deepaul -f Dockerfile.gpu .
 
 # run a certain python through docker
 docker run -it -v "$PWD":/app -w /app -e PYTHONPATH=/root/caffe-ssd/python deepaul python xxx.py
@@ -49,4 +74,4 @@ nvidia-docker run --rm -it \
     --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     deepaul python test.py
-```bash
+```
