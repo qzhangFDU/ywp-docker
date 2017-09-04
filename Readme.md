@@ -62,7 +62,7 @@ nvidia-docker run -rm -it \
     deepaul zsh
 
 # if GUI is needed
-nvidia-docker run -it --rm \                                            
+nvidia-docker run -it --rm \
     --env="PYTHONPATH=/root/caffe-ssd/python" \
     --env="DISPLAY" \
     --workdir=/app \
@@ -82,7 +82,9 @@ nvidia-docker run -it --rm \
 #    --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 #    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 #    deepaul python test.py
-```
 
-# docker size `docker system df`
-# (however) real size is `sudo du -hd 1 /var/lib/docker/aufs/diff | sort -hrk 1 | head -20`
+# docker size 
+docker system df
+# (however) real size in the disk is
+sudo du -hd 1 /var/lib/docker/aufs/diff | sort -hrk 1 | head -20
+```
