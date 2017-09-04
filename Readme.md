@@ -20,20 +20,21 @@ This dockerfile includes:
 
 * Welcome to grab this, but note that I am new to Docker and this dockerfile is also for practice. 
 
-# Install docker
+## Install docker
 https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
 
 ```bash
+# post-installation
 sudo groupadd docker
 sudo usermod -aG docker $USER
 (log out and in)
 docker run hello-world
 ```
 
-# Install nvidia-docker
+## Install nvidia-docker
 https://github.com/NVIDIA/nvidia-docker
 
-# Move docker directory (in case of the lack of the root space)
+## Move docker directory (in case of the lack of the root space)
 https://linuxconfig.org/how-to-move-docker-s-default-var-lib-docker-to-another-directory-on-ubuntu-debian-linux
 ```bash
 systemctl stop docker                       # (or) docker service stop
@@ -46,7 +47,7 @@ systemctl daemon-reload
 systemctl start docker
 ```
 
-# Some useful commands
+## Some useful commands
 
 ```bash
 # build
