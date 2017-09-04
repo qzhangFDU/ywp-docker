@@ -62,18 +62,26 @@ nvidia-docker run -rm -it \
     deepaul zsh
 
 # if GUI is needed
-nvidia-docker run --rm -it \
-    --user=$(id -u) \
+nvidia-docker run -it --rm \                                            
     --env="PYTHONPATH=/root/caffe-ssd/python" \
     --env="DISPLAY" \
     --workdir=/app \
     --volume="$PWD":/app \
-    --volume="/etc/group:/etc/group:ro" \
-    --volume="/etc/passwd:/etc/passwd:ro" \
-    --volume="/etc/shadow:/etc/shadow:ro" \
-    --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
-    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-    deepaul python test.py
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix" \
+    deepaul python
+
+# nvidia-docker run --rm -it \
+#    --user=$(id -u) \
+#    --env="PYTHONPATH=/root/caffe-ssd/python" \
+#    --env="DISPLAY" \
+#    --workdir=/app \
+#    --volume="$PWD":/app \
+#    --volume="/etc/group:/etc/group:ro" \
+#    --volume="/etc/passwd:/etc/passwd:ro" \
+#    --volume="/etc/shadow:/etc/shadow:ro" \
+#    --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
+#    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+#    deepaul python test.py
 ```
 
 # docker size `docker system df`
