@@ -75,3 +75,6 @@ nvidia-docker run --rm -it \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     deepaul python test.py
 ```
+
+# docker size `docker system df`
+# (however) real size is `sudo du -hd 1 /var/lib/docker/aufs/diff | sort -hrk 1 | head -20`
