@@ -47,7 +47,7 @@ systemctl daemon-reload
 systemctl start docker
 ```
 
-## Some useful commands
+## Some useful command examples
 
 ```bash
 # build
