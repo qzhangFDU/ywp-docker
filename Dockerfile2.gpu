@@ -43,7 +43,6 @@ RUN apt-get update && apt-get install -y \
 		python-dev \
 		software-properties-common \
 		unzip \
-		vim \
 		wget \
 		zlib1g-dev \
 		qt5-default \
@@ -80,7 +79,7 @@ RUN apt-get update && apt-get install -y \
 		ant \
 		default-jdk \
 		doxygen \
-        sudo \
+		sudo \
 		&& \
 	apt-get clean && \
 	apt-get autoremove && \
@@ -236,21 +235,19 @@ RUN git clone --depth 1 https://github.com/opencv/opencv.git /root/opencv && \
 COPY caffe-ssd /root/caffe-ssd
 RUN	cd /root/caffe-ssd && \
 	git checkout ssd && \
-	make -j8 && \
+	make -j"$(nproc)" && \
 	make py && \
-	make test -j8
+	make test -j"$(nproc)"
 #	make runtest -j8    remove test part since it requires GPU running, which can only be done with nvidia-docker.
 
 
 WORKDIR ~
-RUN ["apt-get", "update"]
+# RUN ["apt-get", "update"]
 RUN ["apt-get", "install", "-y", "zsh"]
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-RUN apt-get install -y \
-	tmux git-core fonts-powerline wget openssh-server xclip
-
-RUN service ssh restart
+RUN apt-get install -y tmux git-core fonts-powerline
+# RUN service ssh restart
 
 RUN apt-get remove -y --purge vim vim-runtime vim-gnome vim-tiny vim-gui-common
 RUN apt-get install -y \
@@ -300,7 +297,7 @@ RUN export uid=1000 gid=1000 && \
 
 USER developer
 ENV HOME /home/developer
-RUN chown -R developer.developer /root
+RUN chown -R developer:developer /root
 CMD /bin/bash
 
 # WORKDIR "/root"

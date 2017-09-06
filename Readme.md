@@ -63,6 +63,8 @@ nvidia-docker run -rm -it \
     deepaul zsh
 
 # if GUI is needed
+# useful links: http://somatorio.org/en/post/running-gui-apps-with-docker/
+# useful links: http://wiki.ros.org/docker/Tutorials/GUI
 nvidia-docker run -it --rm \
     --env="PYTHONPATH=/root/caffe-ssd/python" \
     --env="DISPLAY" \
@@ -88,4 +90,9 @@ nvidia-docker run -it --rm \
 docker system df
 # (however) real size in the disk is
 sudo du -hd 1 /var/lib/docker/aufs/diff | sort -hrk 1 | head -20
+
+# docker reset
+service docker stop 
+sudo rm -rf /var/lib/docker/ && sudo rm -rf /var/lib/docker/image/aufs
+service docker start 
 ```
