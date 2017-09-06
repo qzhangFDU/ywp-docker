@@ -1,6 +1,6 @@
 FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
-MAINTAINER Sai Soundararaj <saip@outlook.com>
+MAINTAINER Paul Kwon <paulkwon@phantom.ai>
 
 ARG THEANO_VERSION=rel-0.9.0
 ARG TENSORFLOW_VERSION=1.3.0
