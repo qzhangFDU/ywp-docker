@@ -1,6 +1,6 @@
 FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
-MAINTAINER Paul Kwon <paulkwon@phantom.ai>
+MAINTAINER Sai Soundararaj <saip@outlook.com>
 
 ARG THEANO_VERSION=rel-0.9.0
 ARG TENSORFLOW_VERSION=1.3.0
@@ -15,6 +15,8 @@ ARG CAFFE_VERSION=master
 #	echo -e "\n**********************\nCUDA Version\n**********************\n" && \
 #	nvcc -V && \
 #	echo -e "\n\nBuilding your Deep Learning Docker Image...\n"
+USER developer
+ENV HOME /home/developer
 
 # Install some dependencies
 RUN apt-get update && apt-get install -y \
@@ -43,6 +45,7 @@ RUN apt-get update && apt-get install -y \
 		python-dev \
 		software-properties-common \
 		unzip \
+		vim \
 		wget \
 		zlib1g-dev \
 		qt5-default \
@@ -79,7 +82,7 @@ RUN apt-get update && apt-get install -y \
 		ant \
 		default-jdk \
 		doxygen \
-		sudo \
+        sudo \
 		&& \
 	apt-get clean && \
 	apt-get autoremove && \
@@ -155,8 +158,8 @@ RUN apt-get update && apt-get install -y \
 	rm -rf /var/lib/apt/lists/*
 
 # Install Caffe
-RUN git clone -b ${CAFFE_VERSION} --depth 1 https://github.com/BVLC/caffe.git /root/caffe && \
-	cd /root/caffe && \
+RUN git clone -b ${CAFFE_VERSION} --depth 1 https://github.com/BVLC/caffe.git /home/developer/caffe && \
+	cd /home/developer/caffe && \
 	cat python/requirements.txt | xargs -n1 pip install && \
 	mkdir build && cd build && \
 	cmake -DUSE_CUDNN=1 -DBLAS=Open .. && \
@@ -164,7 +167,7 @@ RUN git clone -b ${CAFFE_VERSION} --depth 1 https://github.com/BVLC/caffe.git /r
 	make install
 
 # Set up Caffe environment variables
-ENV CAFFE_ROOT=/root/caffe
+ENV CAFFE_ROOT=/home/developer/caffe
 ENV PYCAFFE_ROOT=$CAFFE_ROOT/python
 ENV PYTHONPATH=$PYCAFFE_ROOT:$PYTHONPATH \
 	PATH=$CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
@@ -180,7 +183,7 @@ RUN pip --no-cache-dir install git+git://github.com/Theano/Theano.git@${THEANO_V
 		\n[nvcc]\nfastmath=True \
 		\n[blas]\nldflag = -L/usr/lib/openblas-base -lopenblas \
 		\n[DebugMode]\ncheck_finite=1" \
-	> /root/.theanorc
+	> /home/developer/.theanorc
 
 
 # Install Keras
@@ -192,18 +195,18 @@ RUN pip --no-cache-dir install git+git://github.com/Lasagne/Lasagne.git@${LASAGN
 
 
 # Install Torch
-RUN git clone https://github.com/torch/distro.git /root/torch --recursive && \
-	cd /root/torch && \
+RUN git clone https://github.com/torch/distro.git /home/developer/torch --recursive && \
+	cd /home/developer/torch && \
 	bash install-deps && \
 	yes no | ./install.sh
 
 # Export the LUA evironment variables manually
-ENV LUA_PATH='/root/.luarocks/share/lua/5.1/?.lua;/root/.luarocks/share/lua/5.1/?/init.lua;/root/torch/install/share/lua/5.1/?.lua;/root/torch/install/share/lua/5.1/?/init.lua;./?.lua;/root/torch/install/share/luajit-2.1.0-beta1/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua' \
-	LUA_CPATH='/root/.luarocks/lib/lua/5.1/?.so;/root/torch/install/lib/lua/5.1/?.so;./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so' \
-	PATH=/root/torch/install/bin:$PATH \
-	LD_LIBRARY_PATH=/root/torch/install/lib:$LD_LIBRARY_PATH \
-	DYLD_LIBRARY_PATH=/root/torch/install/lib:$DYLD_LIBRARY_PATH
-ENV LUA_CPATH='/root/torch/install/lib/?.so;'$LUA_CPATH
+ENV LUA_PATH='/home/developer/.luarocks/share/lua/5.1/?.lua;/home/developer/.luarocks/share/lua/5.1/?/init.lua;/home/developer/torch/install/share/lua/5.1/?.lua;/home/developer/torch/install/share/lua/5.1/?/init.lua;./?.lua;/home/developer/torch/install/share/luajit-2.1.0-beta1/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua' \
+	LUA_CPATH='/home/developer/.luarocks/lib/lua/5.1/?.so;/home/developer/torch/install/lib/lua/5.1/?.so;./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so' \
+	PATH=/home/developer/torch/install/bin:$PATH \
+	LD_LIBRARY_PATH=/home/developer/torch/install/lib:$LD_LIBRARY_PATH \
+	DYLD_LIBRARY_PATH=/home/developer/torch/install/lib:$DYLD_LIBRARY_PATH
+ENV LUA_CPATH='/home/developer/torch/install/lib/?.so;'$LUA_CPATH
 
 # Install the latest versions of nn, cutorch, cunn, cuDNN bindings and iTorch
 RUN luarocks install nn && \
@@ -211,17 +214,17 @@ RUN luarocks install nn && \
 	luarocks install cunn && \
     luarocks install loadcaffe && \
 	\
-	cd /root && git clone https://github.com/soumith/cudnn.torch.git && cd cudnn.torch && \
+	cd /home/developer && git clone https://github.com/soumith/cudnn.torch.git && cd cudnn.torch && \
 	git checkout R4 && \
 	luarocks make && \
 	\
-	cd /root && git clone https://github.com/facebook/iTorch.git && \
+	cd /home/developer && git clone https://github.com/facebook/iTorch.git && \
 	cd iTorch && \
 	luarocks make
 
 # Install OpenCV
-RUN git clone --depth 1 https://github.com/opencv/opencv.git /root/opencv && \
-	cd /root/opencv && \
+RUN git clone --depth 1 https://github.com/opencv/opencv.git /home/developer/opencv && \
+	cd /home/developer/opencv && \
 	mkdir build && \
 	cd build && \
 	cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON -DWITH_XINE=ON -DBUILD_EXAMPLES=OFF -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs .. && \
@@ -232,29 +235,31 @@ RUN git clone --depth 1 https://github.com/opencv/opencv.git /root/opencv && \
 
 
 # Caffe-SSD
-COPY caffe-ssd /root/caffe-ssd
-RUN	cd /root/caffe-ssd && \
+COPY caffe-ssd /home/developer/caffe-ssd
+RUN	cd /home/developer/caffe-ssd && \
 	git checkout ssd && \
-	make -j"$(nproc)" && \
+	make -j8 && \
 	make py && \
-	make test -j"$(nproc)"
+	make test -j8
 #	make runtest -j8    remove test part since it requires GPU running, which can only be done with nvidia-docker.
 
 
 WORKDIR ~
-# RUN ["apt-get", "update"]
+RUN ["apt-get", "update"]
 RUN ["apt-get", "install", "-y", "zsh"]
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-RUN apt-get install -y tmux git-core fonts-powerline
-# RUN service ssh restart
+RUN apt-get install -y \
+	tmux git-core fonts-powerline wget openssh-server xclip
+
+RUN service ssh restart
 
 RUN apt-get remove -y --purge vim vim-runtime vim-gnome vim-tiny vim-gui-common
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
 	liblua5.1-dev luajit libluajit-5.1 python-dev python3-dev ruby-dev libperl-dev libncurses5-dev libatk1.0-dev libx11-dev libxpm-dev libxt-dev
 
-RUN git clone https://github.com/vim/vim.git /root/vim && \
- 	cd /root/vim && \
+RUN git clone https://github.com/vim/vim.git /home/developer/vim && \
+ 	cd /home/developer/vim && \
 	./configure \
 	--enable-multibyte \
 	--enable-perlinterp=dynamic \
@@ -274,13 +279,13 @@ RUN git clone https://github.com/vim/vim.git /root/vim && \
 	--with-compiledby="YW P Kwon" \
     --enable-fail-if-missing && \
     make && make install && \
-    git clone https://github.com/gmarik/Vundle.vim.git /root/.vim/bundle/Vundle.vim
+    git clone https://github.com/gmarik/Vundle.vim.git /home/developer/.vim/bundle/Vundle.vim
 
 # Set up notebook config
-COPY jupyter_notebook_config.py /root/.jupyter/
+COPY jupyter_notebook_config.py /home/developer/.jupyter/
 
 # Jupyter has issues with being run directly: https://github.com/ipython/ipython/issues/7062
-COPY run_jupyter.sh /root/
+COPY run_jupyter.sh /home/developer/
 
 # Expose Ports for TensorBoard (6006), Ipython (8888)
 EXPOSE 6006 8888
@@ -295,10 +300,8 @@ RUN export uid=1000 gid=1000 && \
     chown ${uid}:${gid} -R /home/developer && \
     chown ${uid}:${gid} -R /root
 
-USER developer
-ENV HOME /home/developer
-RUN chown -R developer:developer /root
+#RUN chown -R developer:developer /root
 CMD /bin/bash
 
-# WORKDIR "/root"
+# WORKDIR "/home/developer"
 #CMD ["/bin/bash"]
